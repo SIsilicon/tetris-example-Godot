@@ -8,10 +8,16 @@ enum {FALL_SPEED = 100, DROP_SPEED = 400, CONTROL_SPEED = 200}
 #Tetromino shapes along with colours
 const Shapes = preload("res://Tetrominoes.png")
 
+#How metallic the bricks look
+const metallic = 0.0
+
 var type = 0 setget set_type
 
 #Emitted when colliding with something
 signal collided(collision)
+
+func _ready():
+	set_type(type)
 
 func _process(delta):
 	if not Engine.editor_hint:
@@ -35,7 +41,6 @@ func _process(delta):
 		move_and_slide(lv, Vector2(0, -20))
 		if get_slide_count():
 			emit_signal("collided", get_slide_collision(0))
-		
 
 func set_type(t):
 	type = t
@@ -51,7 +56,6 @@ func set_type(t):
 	for y in range(0, 4):
 		for x in range(0, 4):
 			var colour = shapes.get_pixel(x, y)
-			
 			#Make a brick where the pixel is opaque
 			if colour.a:
 				var new_brick = preload("Brick.tscn").instance()
@@ -61,9 +65,8 @@ func set_type(t):
 				add_child(new_brick)
 				
 				#Set the color of the tetromino's brick
-				#Blend with white to wash the color a bit
-				new_brick.get_node("Diffuse").modulate = \
-				colour.blend(Color(1,1,1, 0.25))
+				new_brick.get_node("Diffuse").modulate = colour.blend(Color(0,0,0,metallic))
+				new_brick.get_node("Specular").modulate = colour.blend(Color(1,1,1,1-metallic))
 	
 	shapes.unlock()
 
